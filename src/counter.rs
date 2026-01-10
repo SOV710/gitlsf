@@ -4,12 +4,16 @@
 //! with support for parallel processing to handle large repositories efficiently.
 
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::Read;
 use std::path::Path;
 
+use memchr::memchr_iter;
 use rayon::prelude::*;
 
 use crate::error::{GitlsError, Result};
+
+/// Buffer size for reading files (64KB).
+const BUFFER_SIZE: usize = 64 * 1024;
 
 /// Result of counting lines in a single file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -55,7 +59,7 @@ impl CountSummary {
     }
 }
 
-/// Counts lines in a single file.
+/// Counts lines in a single file using fast byte-level scanning.
 ///
 /// # Arguments
 ///
@@ -83,17 +87,39 @@ pub fn count_lines(base_path: impl AsRef<Path>, file_path: impl AsRef<Path>) -> 
     let file = file_path.as_ref();
     let full_path = base.join(file);
 
-    let f = File::open(&full_path).map_err(|e| GitlsError::io(&full_path, e))?;
-    let reader = BufReader::new(f);
+    let mut f = File::open(&full_path).map_err(|e| GitlsError::io(&full_path, e))?;
 
-    let count = reader.lines().count();
+    let mut buffer = [0u8; BUFFER_SIZE];
+    let mut count = 0usize;
+    let mut last_byte = None;
+
+    loop {
+        let bytes_read = f
+            .read(&mut buffer)
+            .map_err(|e| GitlsError::io(&full_path, e))?;
+
+        if bytes_read == 0 {
+            break;
+        }
+
+        let chunk = &buffer[..bytes_read];
+        count += memchr_iter(b'\n', chunk).count();
+        last_byte = chunk.last().copied();
+    }
+
+    // If file is non-empty and doesn't end with newline, count the last line
+    if let Some(b) = last_byte
+        && b != b'\n'
+    {
+        count += 1;
+    }
 
     Ok(count)
 }
 
 /// Counts lines in multiple files in parallel.
 ///
-/// Files that cannot be read are skipped with a warning (if the callback is provided).
+/// Files that cannot be read are skipped.
 ///
 /// # Arguments
 ///
