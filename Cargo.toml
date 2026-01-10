@@ -5,7 +5,11 @@ edition = "2024"
 authors = ["SOV710 <chris916911179@outlook.com>"]
 description = "A fast Git repository line counter"
 license = "MIT"
+license-file = "LICENSE"
 repository = "https://github.com/SOV710/gitlsf"
+homepage = "https://github.com/SOV710/gitlsf"
+documentation = "https://github.com/SOV710/gitlsf"
+readme = "README.md"
 keywords = ["cli", "git", "line-count", "statistics"]
 categories = ["command-line-utilities", "development-tools"]
 
