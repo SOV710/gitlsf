@@ -14,7 +14,7 @@ A fast Git repository line counter written in Rust.
 ### From source
 
 ```bash
-git clone https://github.com/yourusername/gitls.git
+git clone https://github.com/SOV710/gitls.git
 cd gitls
 cargo install --path .
 ```
@@ -27,7 +27,7 @@ cargo install gitls
 
 ### Pre-built binaries
 
-Download pre-built binaries from the [Releases](https://github.com/yourusername/gitls/releases) page.
+Download pre-built binaries from the [Releases](https://github.com/SOV710/gitls/releases) page.
 
 ## Usage
 
