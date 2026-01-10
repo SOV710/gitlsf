@@ -11,18 +11,18 @@ A fast Git repository line counter written in Rust.
 
 ## Installation
 
+### From crates.io
+
+```bash
+cargo install gitlsf
+```
+
 ### From source
 
 ```bash
 git clone https://github.com/SOV710/gitlsf.git
 cd gitlsf
 cargo install --path .
-```
-
-### From crates.io (coming soon)
-
-```bash
-cargo install gitlsf
 ```
 
 ### Pre-built binaries
