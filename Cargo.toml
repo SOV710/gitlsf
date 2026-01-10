@@ -1,11 +1,11 @@
 [package]
-name = "gitls"
+name = "gitlsf"
 version = "0.1.0"
 edition = "2024"
 authors = ["SOV710 <chris916911179@outlook.com>"]
 description = "A fast Git repository line counter"
 license = "MIT"
-repository = "https://github.com/SOV710/gitls"
+repository = "https://github.com/SOV710/gitlsf"
 keywords = ["cli", "git", "line-count", "statistics"]
 categories = ["command-line-utilities", "development-tools"]
 

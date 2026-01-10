@@ -10,7 +10,7 @@ use std::path::Path;
 use memchr::memchr_iter;
 use rayon::prelude::*;
 
-use crate::error::{GitlsError, Result};
+use crate::error::{GitlsfError, Result};
 
 /// Buffer size for reading files (64KB).
 const BUFFER_SIZE: usize = 64 * 1024;
@@ -77,7 +77,7 @@ impl CountSummary {
 /// # Example
 ///
 /// ```no_run
-/// use gitls::counter::count_lines;
+/// use gitlsf::counter::count_lines;
 ///
 /// let lines = count_lines(".", "src/main.rs").unwrap();
 /// println!("Lines: {}", lines);
@@ -87,7 +87,7 @@ pub fn count_lines(base_path: impl AsRef<Path>, file_path: impl AsRef<Path>) -> 
     let file = file_path.as_ref();
     let full_path = base.join(file);
 
-    let mut f = File::open(&full_path).map_err(|e| GitlsError::io(&full_path, e))?;
+    let mut f = File::open(&full_path).map_err(|e| GitlsfError::io(&full_path, e))?;
 
     let mut buffer = [0u8; BUFFER_SIZE];
     let mut count = 0usize;
@@ -96,7 +96,7 @@ pub fn count_lines(base_path: impl AsRef<Path>, file_path: impl AsRef<Path>) -> 
     loop {
         let bytes_read = f
             .read(&mut buffer)
-            .map_err(|e| GitlsError::io(&full_path, e))?;
+            .map_err(|e| GitlsfError::io(&full_path, e))?;
 
         if bytes_read == 0 {
             break;
@@ -133,7 +133,7 @@ pub fn count_lines(base_path: impl AsRef<Path>, file_path: impl AsRef<Path>) -> 
 /// # Example
 ///
 /// ```no_run
-/// use gitls::counter::count_lines_parallel;
+/// use gitlsf::counter::count_lines_parallel;
 ///
 /// let files = vec!["src/main.rs", "src/lib.rs"];
 /// let summary = count_lines_parallel(".", files);

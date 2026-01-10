@@ -37,7 +37,7 @@ impl FileFilter {
     /// # Example
     ///
     /// ```
-    /// use gitls::filter::FileFilter;
+    /// use gitlsf::filter::FileFilter;
     ///
     /// let filter = FileFilter::new();
     /// assert!(filter.should_count("src/main.rs"));
@@ -56,7 +56,7 @@ impl FileFilter {
     /// # Example
     ///
     /// ```
-    /// use gitls::filter::FileFilter;
+    /// use gitlsf::filter::FileFilter;
     ///
     /// let filter = FileFilter::new().exclude_extension("log");
     /// assert!(!filter.should_count("debug.log"));
@@ -75,7 +75,7 @@ impl FileFilter {
     /// # Example
     ///
     /// ```
-    /// use gitls::filter::FileFilter;
+    /// use gitlsf::filter::FileFilter;
     ///
     /// let filter = FileFilter::new().exclude_filename("Makefile.bak");
     /// assert!(!filter.should_count("Makefile.bak"));
@@ -98,7 +98,7 @@ impl FileFilter {
     /// # Example
     ///
     /// ```
-    /// use gitls::filter::FileFilter;
+    /// use gitlsf::filter::FileFilter;
     ///
     /// let filter = FileFilter::new();
     ///
@@ -165,7 +165,7 @@ impl FileFilter {
     /// # Example
     ///
     /// ```
-    /// use gitls::filter::FileFilter;
+    /// use gitlsf::filter::FileFilter;
     ///
     /// let filter = FileFilter::new();
     /// let files = vec![

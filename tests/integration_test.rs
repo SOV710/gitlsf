@@ -1,4 +1,4 @@
-//! Integration tests for the gitls CLI tool.
+//! Integration tests for the gitlsf CLI tool.
 
 #![allow(deprecated)]
 
@@ -68,7 +68,7 @@ fn setup_git_repo() -> TempDir {
 
 #[test]
 fn test_help() {
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
     cmd.arg("--help")
         .assert()
         .success()
@@ -77,7 +77,7 @@ fn test_help() {
 
 #[test]
 fn test_version() {
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
     cmd.arg("--version")
         .assert()
         .success()
@@ -87,7 +87,7 @@ fn test_version() {
 #[test]
 fn test_verbose_mode_default() {
     let temp_dir = setup_git_repo();
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
 
     cmd.arg(temp_dir.path())
         .assert()
@@ -101,7 +101,7 @@ fn test_verbose_mode_default() {
 #[test]
 fn test_verbose_mode_explicit() {
     let temp_dir = setup_git_repo();
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
 
     cmd.arg("-v")
         .arg(temp_dir.path())
@@ -114,7 +114,7 @@ fn test_verbose_mode_explicit() {
 #[test]
 fn test_quiet_mode() {
     let temp_dir = setup_git_repo();
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
 
     cmd.arg("-q")
         .arg(temp_dir.path())
@@ -127,7 +127,7 @@ fn test_quiet_mode() {
 #[test]
 fn test_summary_mode() {
     let temp_dir = setup_git_repo();
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
 
     cmd.arg("-s")
         .arg(temp_dir.path())
@@ -140,7 +140,7 @@ fn test_summary_mode() {
 #[test]
 fn test_not_a_git_repo() {
     let temp_dir = TempDir::new().unwrap();
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
 
     cmd.arg(temp_dir.path())
         .assert()
@@ -161,7 +161,7 @@ fn test_filters_binary_files() {
         .output()
         .unwrap();
 
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
     cmd.arg(temp_dir.path())
         .assert()
         .success()
@@ -172,7 +172,7 @@ fn test_filters_binary_files() {
 #[test]
 fn test_filters_config_files() {
     let temp_dir = setup_git_repo();
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
 
     cmd.arg(temp_dir.path())
         .assert()
@@ -188,7 +188,7 @@ fn test_line_count_accuracy() {
     let temp_dir = setup_git_repo();
 
     // main.rs: 3 lines, lib.rs: 3 lines, utils.rs: 3 lines = 9 total
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
     cmd.arg("-q")
         .arg(temp_dir.path())
         .assert()
@@ -201,7 +201,7 @@ fn test_summary_file_count() {
     let temp_dir = setup_git_repo();
 
     // 3 .rs files should be counted
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
     cmd.arg("-s")
         .arg(temp_dir.path())
         .assert()
@@ -211,7 +211,7 @@ fn test_summary_file_count() {
 
 #[test]
 fn test_conflicting_flags() {
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
     cmd.args(["-v", "-q"])
         .assert()
         .failure()
@@ -230,7 +230,7 @@ fn test_empty_repo() {
         .output()
         .unwrap();
 
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
     cmd.arg("-q")
         .arg(temp_dir.path())
         .assert()
@@ -243,7 +243,7 @@ fn test_current_directory_default() {
     // This test verifies that the tool works with "." as default
     // We can't easily test this in an isolated way, so we just verify
     // the command runs without errors in a git repo
-    let mut cmd = AssertCmd::cargo_bin("gitls").unwrap();
+    let mut cmd = AssertCmd::cargo_bin("gitlsf").unwrap();
 
     // Run from the project root (which is a git repo)
     cmd.current_dir(env!("CARGO_MANIFEST_DIR"))

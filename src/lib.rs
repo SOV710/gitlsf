@@ -1,6 +1,6 @@
-//! # gitls - Git Repository Line Counter
+//! # gitlsf - Git Repository Line Counter
 //!
-//! `gitls` is a fast command-line tool for counting lines of code in Git repositories.
+//! `gitlsf` is a fast command-line tool for counting lines of code in Git repositories.
 //! It uses `git ls-files` to identify tracked files and filters out binary, configuration,
 //! and documentation files automatically.
 //!
@@ -14,7 +14,7 @@
 //! ## Example Usage
 //!
 //! ```no_run
-//! use gitls::{count_repository, count_repository_with_filter, filter::FileFilter};
+//! use gitlsf::{count_repository, count_repository_with_filter, filter::FileFilter};
 //!
 //! // Count lines in the current directory
 //! let summary = count_repository(".").unwrap();
@@ -41,7 +41,7 @@ pub mod git;
 use std::path::Path;
 
 pub use counter::{CountSummary, FileCount};
-pub use error::{GitlsError, Result};
+pub use error::{GitlsfError, Result};
 pub use filter::FileFilter;
 
 /// Counts lines of code in a Git repository.
@@ -68,7 +68,7 @@ pub use filter::FileFilter;
 /// # Example
 ///
 /// ```no_run
-/// use gitls::count_repository;
+/// use gitlsf::count_repository;
 ///
 /// let summary = count_repository(".").unwrap();
 /// println!("Total: {} lines in {} files", summary.total_lines, summary.file_count);
@@ -99,7 +99,7 @@ pub fn count_repository(path: impl AsRef<Path>) -> Result<CountSummary> {
 /// # Example
 ///
 /// ```no_run
-/// use gitls::{count_repository_with_filter, filter::FileFilter};
+/// use gitlsf::{count_repository_with_filter, filter::FileFilter};
 ///
 /// let filter = FileFilter::new()
 ///     .exclude_extension("log")
@@ -204,6 +204,6 @@ mod tests {
         let result = count_repository(temp_dir.path());
 
         assert!(result.is_err());
-        matches!(result.unwrap_err(), GitlsError::NotAGitRepository);
+        matches!(result.unwrap_err(), GitlsfError::NotAGitRepository);
     }
 }

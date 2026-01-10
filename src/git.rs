@@ -6,7 +6,7 @@
 use std::path::Path;
 use std::process::Command;
 
-use crate::error::{GitlsError, Result};
+use crate::error::{GitlsfError, Result};
 
 /// Retrieves the list of files tracked by Git in the specified directory.
 ///
@@ -30,7 +30,7 @@ use crate::error::{GitlsError, Result};
 /// # Example
 ///
 /// ```no_run
-/// use gitls::git::list_files;
+/// use gitlsf::git::list_files;
 ///
 /// let files = list_files(".").unwrap();
 /// for file in files {
@@ -44,21 +44,21 @@ pub fn list_files(path: impl AsRef<Path>) -> Result<Vec<String>> {
         .arg("ls-files")
         .current_dir(path)
         .output()
-        .map_err(|e| GitlsError::git_with_source("Failed to execute git ls-files", e))?;
+        .map_err(|e| GitlsfError::git_with_source("Failed to execute git ls-files", e))?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         if stderr.contains("not a git repository") {
-            return Err(GitlsError::NotAGitRepository);
+            return Err(GitlsfError::NotAGitRepository);
         }
-        return Err(GitlsError::git(format!(
+        return Err(GitlsfError::git(format!(
             "git ls-files failed: {}",
             stderr.trim()
         )));
     }
 
-    let stdout =
-        String::from_utf8(output.stdout).map_err(|e| GitlsError::utf8("git ls-files output", e))?;
+    let stdout = String::from_utf8(output.stdout)
+        .map_err(|e| GitlsfError::utf8("git ls-files output", e))?;
 
     let files: Vec<String> = stdout
         .lines()
@@ -82,7 +82,7 @@ pub fn list_files(path: impl AsRef<Path>) -> Result<Vec<String>> {
 /// # Example
 ///
 /// ```no_run
-/// use gitls::git::is_git_repository;
+/// use gitlsf::git::is_git_repository;
 ///
 /// if is_git_repository(".") {
 ///     println!("This is a Git repository!");
@@ -157,7 +157,7 @@ mod tests {
         let result = list_files(temp_dir.path());
 
         assert!(result.is_err());
-        matches!(result.unwrap_err(), GitlsError::NotAGitRepository);
+        matches!(result.unwrap_err(), GitlsfError::NotAGitRepository);
     }
 
     #[test]

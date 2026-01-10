@@ -1,4 +1,4 @@
-//! Error types for the gitls crate.
+//! Error types for the gitlsf crate.
 //!
 //! This module defines all error types used throughout the application,
 //! providing clear and informative error messages for various failure scenarios.
@@ -6,9 +6,9 @@
 use std::path::PathBuf;
 use thiserror::Error;
 
-/// The main error type for gitls operations.
+/// The main error type for gitlsf operations.
 #[derive(Error, Debug)]
-pub enum GitlsError {
+pub enum GitlsfError {
     /// Error executing a Git command.
     #[error("Git command failed: {message}")]
     Git {
@@ -44,10 +44,10 @@ pub enum GitlsError {
     NotAGitRepository,
 }
 
-/// A specialized Result type for gitls operations.
-pub type Result<T> = std::result::Result<T, GitlsError>;
+/// A specialized Result type for gitlsf operations.
+pub type Result<T> = std::result::Result<T, GitlsfError>;
 
-impl GitlsError {
+impl GitlsfError {
     /// Creates a new Git error with a message.
     pub fn git(message: impl Into<String>) -> Self {
         Self::Git {
@@ -87,13 +87,13 @@ mod tests {
 
     #[test]
     fn test_git_error_display() {
-        let err = GitlsError::git("test error");
+        let err = GitlsfError::git("test error");
         assert_eq!(err.to_string(), "Git command failed: test error");
     }
 
     #[test]
     fn test_not_a_git_repository_display() {
-        let err = GitlsError::NotAGitRepository;
+        let err = GitlsfError::NotAGitRepository;
         assert_eq!(
             err.to_string(),
             "Not a Git repository (or any parent up to mount point)"
@@ -103,7 +103,7 @@ mod tests {
     #[test]
     fn test_io_error_display() {
         let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, "file not found");
-        let err = GitlsError::io("/some/path", io_err);
+        let err = GitlsfError::io("/some/path", io_err);
         assert!(err.to_string().contains("/some/path"));
     }
 
@@ -111,7 +111,7 @@ mod tests {
     fn test_utf8_error_display() {
         let invalid_utf8 = vec![0xff, 0xfe];
         let utf8_err = String::from_utf8(invalid_utf8).unwrap_err();
-        let err = GitlsError::utf8("git output", utf8_err);
+        let err = GitlsfError::utf8("git output", utf8_err);
         assert!(err.to_string().contains("git output"));
     }
 }

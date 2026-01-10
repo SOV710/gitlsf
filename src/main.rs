@@ -1,19 +1,19 @@
-//! gitls - A fast Git repository line counter.
+//! gitlsf - A fast Git repository line counter.
 //!
-//! This is the CLI entry point for the gitls tool.
+//! This is the CLI entry point for the gitlsf tool.
 
 use std::process::ExitCode;
 
 use clap::Parser;
 
-use gitls::{CountSummary, count_repository};
+use gitlsf::{CountSummary, count_repository};
 
 /// A fast Git repository line counter.
 ///
 /// Counts lines of code in Git repositories, automatically filtering out
 /// binary files, configuration files, and documentation.
 #[derive(Parser, Debug)]
-#[command(name = "gitls")]
+#[command(name = "gitlsf")]
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Path to the Git repository (defaults to current directory)

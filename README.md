@@ -1,4 +1,4 @@
-# gitls
+# gitlsf
 
 A fast Git repository line counter written in Rust.
 
@@ -14,44 +14,44 @@ A fast Git repository line counter written in Rust.
 ### From source
 
 ```bash
-git clone https://github.com/SOV710/gitls.git
-cd gitls
+git clone https://github.com/SOV710/gitlsf.git
+cd gitlsf
 cargo install --path .
 ```
 
 ### From crates.io (coming soon)
 
 ```bash
-cargo install gitls
+cargo install gitlsf
 ```
 
 ### Pre-built binaries
 
-Download pre-built binaries from the [Releases](https://github.com/SOV710/gitls/releases) page.
+Download pre-built binaries from the [Releases](https://github.com/SOV710/gitlsf/releases) page.
 
 ## Usage
 
 ```bash
 # Count lines in current directory
-gitls
+gitlsf
 
 # Count lines in a specific directory
-gitls /path/to/repo
+gitlsf /path/to/repo
 
 # Quiet mode - only show total
-gitls -q
+gitlsf -q
 
 # Summary mode - show file count and total lines
-gitls -s
+gitlsf -s
 
 # Verbose mode (default) - show each file
-gitls -v
+gitlsf -v
 ```
 
 ### Command-line options
 
 ```
-Usage: gitls [OPTIONS] [PATH]
+Usage: gitlsf [OPTIONS] [PATH]
 
 Arguments:
   [PATH]  Path to the Git repository (defaults to current directory)
@@ -86,7 +86,7 @@ Lines: 5
 
 ## Filtered file types
 
-gitls automatically excludes the following file types:
+gitlsf automatically excludes the following file types:
 
 **Media files:** `.mp3`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.woff2`, `.ico`, `.webp`, `.bmp`, `.tiff`, `.wav`, `.mp4`, `.avi`, `.mov`, `.webm`, `.flac`, `.ogg`, `.ttf`, `.woff`, `.eot`, `.otf`, `.pdf`
 
@@ -98,7 +98,7 @@ gitls automatically excludes the following file types:
 
 ## Performance
 
-gitls is designed to be fast even on large repositories:
+gitlsf is designed to be fast even on large repositories:
 
 - Uses `git ls-files` for efficient file listing
 - Parallel line counting with rayon
