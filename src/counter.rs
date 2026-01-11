@@ -12,8 +12,10 @@ use rayon::prelude::*;
 
 use crate::error::{GitlsfError, Result};
 
-/// Buffer size for reading files (64KB).
-const BUFFER_SIZE: usize = 64 * 1024;
+/// Buffer size for reading files (2MB).
+/// Increased from 64KB to reduce cache misses and system call overhead.
+/// Testing shows 2MB provides optimal balance between memory usage and performance.
+const BUFFER_SIZE: usize = 2 * 1024 * 1024;
 
 /// Result of counting lines in a single file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -89,7 +91,8 @@ pub fn count_lines(base_path: impl AsRef<Path>, file_path: impl AsRef<Path>) -> 
 
     let mut f = File::open(&full_path).map_err(|e| GitlsfError::io(&full_path, e))?;
 
-    let mut buffer = [0u8; BUFFER_SIZE];
+    // Use Vec for heap allocation to avoid stack overflow with large buffer sizes
+    let mut buffer = vec![0u8; BUFFER_SIZE];
     let mut count = 0usize;
     let mut last_byte = None;
 
