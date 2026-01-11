@@ -85,9 +85,8 @@ impl CountSummary {
 fn count_lines_mmap(file: &File) -> Result<usize> {
     // SAFETY: We only read from the mapped region and don't modify the file
     let mmap = unsafe {
-        Mmap::map(file).map_err(|e| {
-            GitlsfError::git_with_source("Failed to create memory map", e)
-        })?
+        Mmap::map(file)
+            .map_err(|e| GitlsfError::git_with_source("Failed to create memory map", e))?
     };
 
     let count = memchr_iter(b'\n', &mmap).count();
@@ -227,12 +226,10 @@ where
         .into_iter()
         .filter_map(|path| {
             let full_path = base.join(&path);
-            std::fs::metadata(&full_path)
-                .ok()
-                .map(|meta| FileInfo {
-                    path,
-                    size: meta.len(),
-                })
+            std::fs::metadata(&full_path).ok().map(|meta| FileInfo {
+                path,
+                size: meta.len(),
+            })
         })
         .collect();
 
@@ -247,22 +244,18 @@ where
     // Process small files sequentially (less overhead)
     let small_counts: Vec<FileCount> = small_files
         .iter()
-        .filter_map(|info| {
-            match count_lines(base, &info.path) {
-                Ok(lines) => Some(FileCount::new(info.path.clone(), lines)),
-                Err(_) => None,
-            }
+        .filter_map(|info| match count_lines(base, &info.path) {
+            Ok(lines) => Some(FileCount::new(info.path.clone(), lines)),
+            Err(_) => None,
         })
         .collect();
 
     // Process large files in parallel (sorted by size for work stealing)
     let large_counts: Vec<FileCount> = large_files
         .par_iter()
-        .filter_map(|info| {
-            match count_lines(base, &info.path) {
-                Ok(lines) => Some(FileCount::new(info.path.clone(), lines)),
-                Err(_) => None,
-            }
+        .filter_map(|info| match count_lines(base, &info.path) {
+            Ok(lines) => Some(FileCount::new(info.path.clone(), lines)),
+            Err(_) => None,
         })
         .collect();
 
