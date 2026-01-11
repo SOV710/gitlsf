@@ -1,6 +1,6 @@
 # gitlsf
 
-![CI](https://img.shields.io/github/actions/workflow/status/SOV710/gitlsf/ci.yml?style=flat-square&logo=github&label=CI)
+![CI](https://img.shields.io/github/actions/workflow/status/SOV710/gitlsf/ci.yml?style=flat&logo=github&label=CI&style=flat-square)
 ![License](https://img.shields.io/github/license/SOV710/gitlsf?style=flat-square)
 ![Language](https://img.shields.io/github/languages/top/SOV710/gitlsf?style=flat-square)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/gitlsf?style=flat-square&logo=rust&label=downloads)
