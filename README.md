@@ -1,9 +1,9 @@
 # gitlsf
 
-![CI](https://img.shields.io/github/actions/workflow/status/SOV710/gitlsf/ci.yml?style=flat&logo=github&label=CI&style=flat-square)
-![License](https://img.shields.io/github/license/SOV710/gitlsf?style=flat-square)
-![Language](https://img.shields.io/github/languages/top/SOV710/gitlsf?style=flat-square)
-![Crates.io Total Downloads](https://img.shields.io/crates/d/gitlsf?style=flat-square&logo=rust&label=downloads)
+![CI](https://img.shields.io/github/actions/workflow/status/SOV710/gitlsf/ci.yml?style=plastic&logo=github&label=CI)
+![License](https://img.shields.io/github/license/SOV710/gitlsf?style=plastic)
+![Language](https://img.shields.io/github/languages/top/SOV710/gitlsf?style=plastic)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/gitlsf?style=plastic&logo=rust&label=downloads)
 
 A fast Git repository line counter written in Rust.
 
