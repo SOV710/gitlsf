@@ -22,6 +22,10 @@ const BUFFER_SIZE: usize = 2 * 1024 * 1024;
 /// Files larger than this will use memory mapping for better cache performance.
 const MMAP_THRESHOLD: u64 = 1024 * 1024;
 
+/// Threshold for parallel processing (100KB).
+/// Files smaller than this are processed sequentially in batch.
+const PARALLEL_THRESHOLD: u64 = 100 * 1024;
+
 /// Result of counting lines in a single file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FileCount {
@@ -177,7 +181,18 @@ fn count_lines_buffered(mut f: File, full_path: &Path) -> Result<usize> {
     Ok(count)
 }
 
-/// Counts lines in multiple files in parallel.
+/// Helper structure to store file information for optimized parallel processing.
+#[derive(Debug, Clone)]
+struct FileInfo {
+    path: String,
+    size: u64,
+}
+
+/// Counts lines in multiple files with optimized parallel strategy.
+///
+/// Small files (<100KB) are processed sequentially in batch to reduce
+/// parallel overhead. Large files are sorted by size (descending) and
+/// processed in parallel for optimal work distribution.
 ///
 /// Files that cannot be read are skipped.
 ///
@@ -207,17 +222,55 @@ where
     let base = base_path.as_ref();
     let files: Vec<String> = files.into_iter().map(|f| f.as_ref().to_string()).collect();
 
-    let counts: Vec<FileCount> = files
-        .par_iter()
-        .filter_map(|file_path| {
-            match count_lines(base, file_path) {
-                Ok(lines) => Some(FileCount::new(file_path.clone(), lines)),
-                Err(_) => None, // Skip files that can't be read
+    // Collect file sizes for optimization
+    let mut file_infos: Vec<FileInfo> = files
+        .into_iter()
+        .filter_map(|path| {
+            let full_path = base.join(&path);
+            std::fs::metadata(&full_path)
+                .ok()
+                .map(|meta| FileInfo {
+                    path,
+                    size: meta.len(),
+                })
+        })
+        .collect();
+
+    // Partition files by size
+    let (small_files, mut large_files): (Vec<_>, Vec<_>) = file_infos
+        .drain(..)
+        .partition(|info| info.size < PARALLEL_THRESHOLD);
+
+    // Sort large files by size (descending) for better work distribution
+    large_files.sort_by(|a, b| b.size.cmp(&a.size));
+
+    // Process small files sequentially (less overhead)
+    let small_counts: Vec<FileCount> = small_files
+        .iter()
+        .filter_map(|info| {
+            match count_lines(base, &info.path) {
+                Ok(lines) => Some(FileCount::new(info.path.clone(), lines)),
+                Err(_) => None,
             }
         })
         .collect();
 
-    CountSummary::from_counts(counts)
+    // Process large files in parallel (sorted by size for work stealing)
+    let large_counts: Vec<FileCount> = large_files
+        .par_iter()
+        .filter_map(|info| {
+            match count_lines(base, &info.path) {
+                Ok(lines) => Some(FileCount::new(info.path.clone(), lines)),
+                Err(_) => None,
+            }
+        })
+        .collect();
+
+    // Combine results
+    let mut all_counts = small_counts;
+    all_counts.extend(large_counts);
+
+    CountSummary::from_counts(all_counts)
 }
 
 /// Counts lines in multiple files sequentially.
