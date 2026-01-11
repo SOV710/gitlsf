@@ -5,13 +5,13 @@
 ![Language](https://img.shields.io/github/languages/top/SOV710/gitlsf?style=plastic)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/gitlsf?style=plastic&logo=rust&label=downloads)
 
-A fast Git repository line counter written in Rust.
+A blazing fast Git repository line counter written in Rust.
 
 ## Features
 
-- **Fast**: Uses parallel processing with rayon for efficient counting
+- **BLAZING Fast**: Gitlsf can count tens of millions of lines of code in under 1 second, way more faster than `clac` and `tokei`.
+- **Simple**: Only count lines, and do no more things.
 - **Smart filtering**: Automatically excludes binary, configuration, and documentation files
-- **Multiple output modes**: Verbose, quiet, and summary modes
 - **Git-aware**: Only counts files tracked by Git
 
 ## Installation
