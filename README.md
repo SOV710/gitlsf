@@ -1,5 +1,7 @@
 # gitlsf
 
+![CI](https://img.shields.io/github/actions/workflow/status/SOV710/gitlsf/ci.yml?style=flat-square&logo=github&label=CI)
+
 A fast Git repository line counter written in Rust.
 
 ## Features
