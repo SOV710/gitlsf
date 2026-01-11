@@ -8,6 +8,7 @@ use std::io::Read;
 use std::path::Path;
 
 use memchr::memchr_iter;
+use memmap2::Mmap;
 use rayon::prelude::*;
 
 use crate::error::{GitlsfError, Result};
@@ -16,6 +17,10 @@ use crate::error::{GitlsfError, Result};
 /// Increased from 64KB to reduce cache misses and system call overhead.
 /// Testing shows 2MB provides optimal balance between memory usage and performance.
 const BUFFER_SIZE: usize = 2 * 1024 * 1024;
+
+/// Threshold for using mmap vs buffered reading (1MB).
+/// Files larger than this will use memory mapping for better cache performance.
+const MMAP_THRESHOLD: u64 = 1024 * 1024;
 
 /// Result of counting lines in a single file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -61,7 +66,43 @@ impl CountSummary {
     }
 }
 
+/// Counts lines using memory mapping for large files.
+///
+/// This provides better cache performance for large files by letting
+/// the OS manage page faults and cache coherency.
+///
+/// # Safety
+///
+/// This function uses unsafe code to create a memory map. The safety
+/// is guaranteed because:
+/// - We only read from the mapped memory
+/// - The file is not modified during the mapping
+/// - The Mmap is dropped before the function returns
+fn count_lines_mmap(file: &File) -> Result<usize> {
+    // SAFETY: We only read from the mapped region and don't modify the file
+    let mmap = unsafe {
+        Mmap::map(file).map_err(|e| {
+            GitlsfError::git_with_source("Failed to create memory map", e)
+        })?
+    };
+
+    let count = memchr_iter(b'\n', &mmap).count();
+
+    // Handle files that don't end with newline
+    let has_trailing_newline = mmap.last().map_or(false, |&b| b == b'\n');
+    let final_count = if !mmap.is_empty() && !has_trailing_newline {
+        count + 1
+    } else {
+        count
+    };
+
+    Ok(final_count)
+}
+
 /// Counts lines in a single file using fast byte-level scanning.
+///
+/// For large files (>1MB), uses memory mapping for better cache performance.
+/// For smaller files, uses buffered reading.
 ///
 /// # Arguments
 ///
@@ -89,8 +130,24 @@ pub fn count_lines(base_path: impl AsRef<Path>, file_path: impl AsRef<Path>) -> 
     let file = file_path.as_ref();
     let full_path = base.join(file);
 
-    let mut f = File::open(&full_path).map_err(|e| GitlsfError::io(&full_path, e))?;
+    let f = File::open(&full_path).map_err(|e| GitlsfError::io(&full_path, e))?;
 
+    // Get file size to determine strategy
+    let file_size = f
+        .metadata()
+        .map_err(|e| GitlsfError::io(&full_path, e))?
+        .len();
+
+    // Use mmap for large files, buffered reading for small files
+    if file_size > MMAP_THRESHOLD {
+        count_lines_mmap(&f)
+    } else {
+        count_lines_buffered(f, &full_path)
+    }
+}
+
+/// Counts lines using buffered reading for small files.
+fn count_lines_buffered(mut f: File, full_path: &Path) -> Result<usize> {
     // Use Vec for heap allocation to avoid stack overflow with large buffer sizes
     let mut buffer = vec![0u8; BUFFER_SIZE];
     let mut count = 0usize;
@@ -99,7 +156,7 @@ pub fn count_lines(base_path: impl AsRef<Path>, file_path: impl AsRef<Path>) -> 
     loop {
         let bytes_read = f
             .read(&mut buffer)
-            .map_err(|e| GitlsfError::io(&full_path, e))?;
+            .map_err(|e| GitlsfError::io(full_path, e))?;
 
         if bytes_read == 0 {
             break;
